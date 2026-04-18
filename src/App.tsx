@@ -211,6 +211,13 @@ export default function App() {
           title: 'text-3xl md:text-5xl font-serif font-black italic text-pink-600 p-8 text-center drop-shadow-sm leading-tight',
           body: 'p-8 font-serif italic text-xl text-neutral-800 leading-relaxed'
         };
+      case 'RÁDIO PINGA-SANGUE':
+        return {
+          container: 'bg-[#fcf8f2] border-4 border-red-900 shadow-[12px_12px_0px_0px_#450a0a] paper-grain',
+          header: 'bg-red-900 text-white p-4 font-black uppercase text-center tracking-[0.2em] text-2xl animate-flash-red',
+          title: 'text-4xl md:text-6xl font-sans font-black uppercase leading-tight text-center p-8 border-b-4 border-red-200 text-red-900 italic',
+          body: 'p-8 md:p-12 font-serif text-2xl text-neutral-900 leading-[1.6] text-left gap-8 selection:bg-red-200'
+        };
       default: // tabloide_classico
         return {
           container: 'bg-[#f4ece1] border-4 border-neutral-900 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] paper-grain',
@@ -380,7 +387,7 @@ export default function App() {
                       LOCAL: {ocorrencia.localInventado}
                     </span>
                     <span className="opacity-80">
-                      MELIANTE: MARCA & TONE (HOMEM NEGRO DE BONÉ) EM FLAGRANTE
+                      MELIANTE: MARCA & TONE (INDIVÍDUO DE COR NEGRA DE BONÉ) EM FLAGRANTE
                     </span>
                     <span className="mt-1 text-[10px] italic font-sans text-neutral-500 border-t border-neutral-200 pt-2 w-full max-w-[280px]">
                       Nota: As imagens acima são meramente demonstrativas para não gerar constrangimento desnecessário ao meliante.

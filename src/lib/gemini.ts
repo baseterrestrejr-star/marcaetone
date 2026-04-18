@@ -28,8 +28,9 @@ export async function gerarOcorrencia(nomeUsuario: string): Promise<Ocorrencia> 
     if (res.ok) {
       const result = await res.json();
       result.autor = `Repórter: ${nomeUsuario}`;
-      const encodedPrompt = encodeURIComponent(result.imagem_descricao + ", funny, high quality, vibrant");
-      result.imagem_url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=576&nologo=true&seed=${Math.floor(Math.random() * 999999)}`;
+      const styleSuffix = ", Pixar 3D animation style, Disney movie look, highly detailed, vivid colors, cinematic lighting, funny expressions, 8k resolution";
+      const encodedPrompt = encodeURIComponent(result.imagem_descricao + styleSuffix);
+      result.imagem_url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 999999)}`;
       return result;
     }
 
@@ -48,8 +49,9 @@ export async function gerarOcorrencia(nomeUsuario: string): Promise<Ocorrencia> 
     if (vercelRes.ok) {
       const result = await vercelRes.json();
       result.autor = `Repórter: ${nomeUsuario}`;
-      const encodedPrompt = encodeURIComponent(result.imagem_descricao + ", funny, high quality, vibrant");
-      result.imagem_url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=576&nologo=true&seed=${Math.floor(Math.random() * 999999)}`;
+      const styleSuffix = ", Pixar 3D animation style, Disney movie look, highly detailed, vivid colors, cinematic lighting, funny expressions, 8k resolution";
+      const encodedPrompt = encodeURIComponent(result.imagem_descricao + styleSuffix);
+      result.imagem_url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 999999)}`;
       return result;
     }
     
