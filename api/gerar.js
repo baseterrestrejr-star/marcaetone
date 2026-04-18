@@ -21,7 +21,26 @@ export default async function handler(req, res) {
       if (data && data.nomeUsuario) nomeUsuario = data.nomeUsuario;
     } catch (e) {}
 
-    const prompt = `Gere uma CRÔNICA POLICIAL curta sobre "MARCA & TONE" (homem negro de boné). Repórter: ${nomeUsuario}. JSON: {titulo, materia, nomeJornal, localInventado, imagem_descricao, autor, estilo: {corPrincipal, temaPortal}}`;
+    const prompt = `Você é um escrivão de delegacia na Bahia com um senso de humor afiado. Escreva um BOLETIM DE OCORRÊNCIA (B.O.) extremamente detalhado e CÔMICO sobre o meliante "MARCA & TONE" (homem negro de boné, já conhecido dos meios policiais por ser 'malandro de internet').
+
+        REGRAS DA MATÉRIA:
+        1. LOCAL: Varie entre fila do banco, farmácia, praça, fazenda, pescando, no carrinho de rolimã, moto ou carro.
+        2. CONTEXTO: Ele sempre tenta dar um golpe (tipo golpe do Pix) ou se dar bem, mas acaba se metendo com o público LGBT (travestis, drag queens, transformistas) ou guardas e se dá muito mal.
+        3. DESFECHO: Ele sempre apanha, é humilhado ou acaba preso de forma ridícula.
+        4. ESTILO: Linguagem popular baiana misturada com termos técnicos de B.O. (ex: 'o meliante em tela', 'logrou êxito em se lascar').
+        5. TOM: Hilário, para fazer o leitor rir muito.
+        6. REPÓRTER: ${nomeUsuario}.
+
+        RETORNE APENAS JSON:
+        {
+          "titulo": "Título chamativo e engraçado estilo jornal popular",
+          "materia": "A crônica detalhada em tom de B.O.",
+          "nomeJornal": "Gazeta da Taca" ou "Diário do Meliante",
+          "localInventado": "Nome de um bairro ou cidade na Bahia",
+          "imagem_descricao": "Descrição para gerar uma imagem cômica da confusão (ex: Marca & Tone fugindo de drag queen em um carrinho de rolimã)",
+          "autor": "Inspecione: ${nomeUsuario}",
+          "estilo": { "corPrincipal": "#e63946", "temaPortal": "POLICIAL CÔMICO" }
+        }`;
 
     const modelosParaTentar = [
       "gemini-3-flash-preview",
