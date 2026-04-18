@@ -1,7 +1,5 @@
-import { GoogleGenerativeAI } from "@google/genai";
-
 export default async function handler(req, res) {
-  // CORS Ultra-Permissivo para testes
+  // CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -11,28 +9,43 @@ export default async function handler(req, res) {
 
   try {
     const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    
     if (!apiKey) {
-      return res.status(403).json({ 
-        error: "PLACA NÃO ENCONTRADA: Você esqueceu de colocar a GEMINI_API_KEY nas variáveis da Vercel!" 
-      });
+      return res.status(403).json({ error: "FALTA CHAVE: Configure GEMINI_API_KEY na Vercel." });
     }
 
-    const { nomeUsuario } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    // Parse body safely
+    let nomeUsuario = "Repórter";
+    try {
+      const data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      if (data && data.nomeUsuario) nomeUsuario = data.nomeUsuario;
+    } catch (e) {
+      console.warn("Falha ao parsear body, usando padrão.");
+    }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
+    const prompt = `Gere uma CRÔNICA POLICIAL curta sobre "MARCA & TONE" (homem negro de boné). Repórter: ${nomeUsuario}. JSON: {titulo, materia, nomeJornal, localInventado, imagem_descricao, autor, estilo: {corPrincipal, temaPortal}}`;
+
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    
+    const googleRes = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
     });
 
-    const prompt = `Gere uma CRÔNICA POLICIAL curta sobre "MARCA & TONE" (meliante de boné). Repórter: ${nomeUsuario}. JSON: {titulo, materia, nomeJornal, localInventado, imagem_descricao, autor, estilo: {corPrincipal, temaPortal}}`;
+    const googleData = await googleRes.json();
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    
-    res.status(200).send(text);
+    if (!googleRes.ok) {
+      throw new Error(googleData.error?.message || `Erro Google ${googleRes.status}`);
+    }
+
+    const aiText = googleData.candidates[0].content.parts[0].text;
+    res.status(200).send(aiText);
+
   } catch (error) {
-    res.status(500).json({ error: "A PRENSA TRAVOU: " + error.message });
+    console.error("ERRO CRÍTICO NA API:", error);
+    res.status(500).json({ error: `ERRO DO SERVIDOR: ${error.message}` });
   }
 }
