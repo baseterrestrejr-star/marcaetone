@@ -24,9 +24,9 @@ export default async function handler(req, res) {
     const prompt = `Gere uma CRÔNICA POLICIAL curta sobre "MARCA & TONE" (homem negro de boné). Repórter: ${nomeUsuario}. JSON: {titulo, materia, nomeJornal, localInventado, imagem_descricao, autor, estilo: {corPrincipal, temaPortal}}`;
 
     const modelosParaTentar = [
-      "gemini-1.5-flash",
-      "gemini-1.5-flash-latest",
-      "gemini-pro"
+      "gemini-3-flash-preview",
+      "gemini-flash-latest",
+      "gemini-3.1-flash-lite-preview"
     ];
 
     let ultimoErro = "";
@@ -39,8 +39,7 @@ export default async function handler(req, res) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: "application/json" }
+            contents: [{ parts: [{ text: prompt }] }]
           })
         });
 
