@@ -39,15 +39,32 @@ export default async function handler(req, res) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
           })
         });
 
         const data = await googleRes.json();
 
         if (googleRes.ok) {
-          const aiText = data.candidates[0].content.parts[0].text;
-          return res.status(200).send(aiText);
+          let aiText = data.candidates[0].content.parts[0].text;
+          
+          // Limpeza de Markdown (Caso a IA ignore o MimeType)
+          if (aiText.includes("```")) {
+            aiText = aiText.replace(/```json|```/gi, "").trim();
+          }
+          
+          // Validação final de JSON
+          try {
+            JSON.parse(aiText);
+            return res.status(200).send(aiText);
+          } catch (e) {
+            console.error("IA gerou um JSON inválido, tentando próximo modelo...");
+            ultimoErro = "JSON INVÁLIDO";
+            continue;
+          }
         } else {
           ultimoErro = data.error?.message || `Erro ${googleRes.status}`;
           console.warn(`Tentativa com ${modelName} falhou: ${ultimoErro}`);
