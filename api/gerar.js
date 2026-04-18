@@ -1,15 +1,14 @@
-const https = require('https');
+import https from 'https';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
@@ -17,7 +16,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { nomeUsuario } = req.body;
+    // Na Vercel, req.body pode vir como string ou objeto dependendo do parser
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { nomeUsuario } = body;
     const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
     if (!apiKey || apiKey.length < 5) {
@@ -40,9 +41,9 @@ module.exports = async (req, res) => {
       };
 
       const request = https.request(options, (response) => {
-        let body = '';
-        response.on('data', (d) => body += d);
-        response.on('end', () => resolve({ body, statusCode: response.statusCode }));
+        let responseBody = '';
+        response.on('data', (d) => responseBody += d);
+        response.on('end', () => resolve({ body: responseBody, statusCode: response.statusCode }));
       });
 
       request.on('error', (e) => reject(e));
@@ -58,6 +59,7 @@ module.exports = async (req, res) => {
     const aiText = parsed.candidates[0].content.parts[0].text;
     res.status(200).send(aiText);
   } catch (error) {
+    console.error("Erro na API Vercel:", error);
     res.status(500).json({ error: error.message });
   }
-};
+}
