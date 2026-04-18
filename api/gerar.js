@@ -16,9 +16,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(403).json({ error: "ERRO: Chave GEMINI_API_KEY não encontrada nas variáveis da Vercel." });
+      return res.status(403).json({ error: "ERRO DE CHAVE: Você precisa adicionar GEMINI_API_KEY no painel de Environment Variables da Vercel e dar um Redeploy." });
     }
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

@@ -34,11 +34,16 @@ export async function gerarOcorrencia(nomeUsuario: string): Promise<Ocorrencia> 
     }
 
     // 2. Tenta a Vercel Function (Fallback automático)
-    const vercelRes = await fetch('/api/gerar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nomeUsuario }),
-    });
+    let vercelRes;
+    try {
+      vercelRes = await fetch('/api/gerar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nomeUsuario }),
+      });
+    } catch (e: any) {
+      throw new Error(`Falha de conexão com o servidor da Vercel: ${e.message}`);
+    }
 
     if (vercelRes.ok) {
       const result = await vercelRes.json();
@@ -48,21 +53,20 @@ export async function gerarOcorrencia(nomeUsuario: string): Promise<Ocorrencia> 
       return result;
     }
     
-    // Se deu erro em ambas as tentativas
-    let errorMsg = "A viatura quebrou no caminho.";
+    // Se deu erro em ambas as tentativas, vamos extrair o máximo de info possível
+    let errorMsg = `Erro no Servidor.`;
     
-    if (res.status !== 404) {
+    try {
+      const statusText = vercelRes.status;
+      const responseText = await vercelRes.text();
       try {
-        const data = await res.json();
-        errorMsg = data.error || errorMsg;
-      } catch (e) {}
-    } else if (vercelRes.status !== 404) {
-      try {
-        const data = await vercelRes.json();
-        errorMsg = data.error || errorMsg;
-      } catch (e) {}
-    } else {
-      errorMsg = "Serviço de IA não encontrado em nenhum servidor (404). Verifique o deploy.";
+        const data = JSON.parse(responseText);
+        errorMsg = data.error || `Erro ${statusText}: ${responseText.substring(0, 100)}`;
+      } catch (e) {
+        errorMsg = `Erro ${statusText} na Vercel: ${responseText.substring(0, 100) || 'Sem resposta do servidor'}`;
+      }
+    } catch (e) {
+      errorMsg = "O servidor da Vercel não respondeu corretamente.";
     }
     
     throw new Error(errorMsg);
