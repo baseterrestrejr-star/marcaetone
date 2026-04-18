@@ -48,13 +48,21 @@ export async function gerarOcorrencia(nomeUsuario: string): Promise<Ocorrencia> 
       return result;
     }
     
-    // Se deu erro em ambas
+    // Se deu erro em ambas as tentativas
     let errorMsg = "A viatura quebrou no caminho.";
-    try {
-      const errorData = await res.status !== 404 ? await res.json() : await vercelRes.json();
-      errorMsg = errorData.error || errorMsg;
-    } catch (e) {
-      if (res.status === 404 && vercelRes.status === 404) errorMsg = "Serviço de IA não encontrado. Verifique o deploy.";
+    
+    if (res.status !== 404) {
+      try {
+        const data = await res.json();
+        errorMsg = data.error || errorMsg;
+      } catch (e) {}
+    } else if (vercelRes.status !== 404) {
+      try {
+        const data = await vercelRes.json();
+        errorMsg = data.error || errorMsg;
+      } catch (e) {}
+    } else {
+      errorMsg = "Serviço de IA não encontrado em nenhum servidor (404). Verifique o deploy.";
     }
     
     throw new Error(errorMsg);

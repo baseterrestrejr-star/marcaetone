@@ -109,10 +109,11 @@ export default function App() {
       }
     } catch (err: any) {
       console.error('Erro na geração:', err);
-      let msg = 'Eita! A viatura quebrou no caminho. Tente gerar novamente.';
-      if (err.message?.includes('configurada')) {
+      let msg = err.message || 'Eita! A viatura quebrou no caminho. Tente gerar novamente.';
+      
+      if (msg.includes('configurada')) {
         msg = `ERRO DE CONFIGURAÇÃO: Nenhuma chave API foi encontrada. Verifique o painel "Environment Variables" na Vercel ou Netlify e se fez o Deploy novamente.`;
-      } else if (err.message === 'API_KEY_MISSING') {
+      } else if (msg === 'API_KEY_MISSING') {
         msg = 'ERRO DE CONFIGURAÇÃO: Nenhuma chave API foi encontrada. Verifique se você configurou GEMINI_API_KEY no painel de Environment Variables e se fez o Deploy.';
       }
       setError(msg);
