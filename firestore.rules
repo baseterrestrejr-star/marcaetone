@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper for IDs
+    function isValidId(id) { 
+      return id is string && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    match /ocorrencias/{ocorrenciaId} {
+      allow get: if isValidId(ocorrenciaId);
+      allow create: if isValidId(ocorrenciaId) 
+        && request.resource.data.titulo is string 
+        && request.resource.data.titulo.size() <= 200
+        && request.resource.data.materia is string
+        && request.resource.data.materia.size() <= 10000;
+      
+      // No updates or deletes allowed from client for security
+      allow update, delete: if false;
+    }
+  }
+}

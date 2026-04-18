@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "Ocorrencia": {
+      "title": "Ocorrência Policial",
+      "description": "Uma crônica policial gerada pela IA sobre as desventuras de Marca & Tone.",
+      "type": "object",
+      "properties": {
+        "titulo": { "type": "string" },
+        "materia": { "type": "string" },
+        "nomeJornal": { "type": "string" },
+        "localInventado": { "type": "string" },
+        "imagem_url": { "type": "string" },
+        "imagem_descricao": { "type": "string" },
+        "mensagem_whatsapp": { "type": "string" },
+        "texto_copiavel": { "type": "string" },
+        "autor": { "type": "string" },
+        "estilo": {
+          "type": "object",
+          "properties": {
+            "corPrincipal": { "type": "string" },
+            "temaPortal": { "type": "string" }
+          },
+          "required": ["corPrincipal", "temaPortal"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["titulo", "materia", "nomeJornal", "localInventado", "imagem_url", "autor", "estilo"]
+    }
+  },
+  "firestore": {
+    "/ocorrencias/{ocorrenciaId}": {
+      "schema": "Ocorrencia",
+      "description": "Armazena as ocorrências geradas para compartilhamento via link curto."
+    }
+  }
+}
