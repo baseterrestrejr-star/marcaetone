@@ -278,57 +278,61 @@ export default function App() {
     setCapturing(true);
     setError(null);
 
+    let shareUrl = SITE_URL;
     try {
-      const shareUrl = await getShortLink(ocorrencia);
+      shareUrl = await getShortLink(ocorrencia);
       const textoFinal = `Gere vc tambem a reportagem do meliante em: ${shareUrl}`;
       
+      // Captura a imagem com maior qualidade e silêncio
       const blob = await domtoimage.toBlob(newspaperRef.current, {
         bgcolor: '#f4ece1',
         width: newspaperRef.current.clientWidth,
-        height: newspaperRef.current.clientHeight
+        height: newspaperRef.current.clientHeight,
+        quality: 0.95
       });
 
-      if (!blob) throw new Error('Não foi possível gerar a imagem');
+      if (!blob) throw new Error('Falha ao gerar blob');
 
-      // Detecta se é mobile (para decidir entre Share API e Clipboard + Redirect)
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const canShareFiles = navigator.canShare && navigator.canShare({ files: [new File([blob], 'capa.png', {type: 'image/png'})] });
 
-      if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'a.png', {type:'image/png'})] })) {
-        // Celular: Share API funciona perfeitamente com ambos
+      if (isMobile && navigator.share && canShareFiles) {
+        // Fluxo Mobile Moderno: Share nativo com arquivo + texto
         const file = new File([blob], 'capa-jornal.png', { type: 'image/png' });
-        await navigator.share({
-          files: [file],
-          title: 'Flagrante no Jornal do Vexame',
-          text: textoFinal,
-        });
-      } else {
-        // Desktop (Windows/Mac): Melhor fluxo possível
-        if (navigator.clipboard && window.ClipboardItem) {
-          try {
-            // 1. Copia APENAS a imagem para a memória (para não dar conflito com o link)
-            const item = new ClipboardItem({ 'image/png': blob });
-            await navigator.clipboard.write([item]);
-            triggerCopied('zap');
-          } catch (clipErr) {
-            console.error('Falha ao copiar imagem:', clipErr);
-          }
-          
-          // 2. Prepara a URL mas NÃO abre ainda
-          const zapUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoFinal)}`;
-          setPendingZapUrl(zapUrl);
-          
-          // 3. Mostra o Guia de Ajuda Visual primeiro
-          setShowZapGuide(true);
-        } else {
-          // Fallback se o navegador for antigo
-          await navigator.clipboard.writeText(textoFinal);
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textoFinal)}`, '_blank');
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Jornal do Vexame - Marca & Tone',
+            text: textoFinal,
+          });
+          return; // Sucesso mobile
+        } catch (shareErr) {
+          console.warn('Share nativo cancelado ou falhou:', shareErr);
+          // Continua para o fluxo de guia/clipboard se o nativo falhar
         }
       }
+
+      // Fluxo Desktop / Fallback Mobile: Cópia para Clipboard + Guia Visual
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          const item = new ClipboardItem({ 'image/png': blob });
+          await navigator.clipboard.write([item]);
+          triggerCopied('zap');
+        } catch (clipErr) {
+          console.error('Falha na Clipboard API:', clipErr);
+        }
+        
+        setPendingZapUrl(`https://api.whatsapp.com/send?text=${encodeURIComponent(textoFinal)}`);
+        setShowZapGuide(true);
+      } else {
+        // Fallback total (Navegadores muito antigos)
+        await navigator.clipboard.writeText(textoFinal);
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textoFinal)}`, '_blank');
+      }
     } catch (err) {
-      console.error('Erro ao compartilhar:', err);
-      // Fallback para o usuário não ficar na mão
-      window.open(`https://api.whatsapp.com/send?text=Gere vc tambem a reportagem do meliante: ${SITE_URL}`, '_blank');
+      console.error('Erro total no compartilhamento:', err);
+      // Fallback de emergência: abre apenas o link
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`Gere vc tambem a reportagem do meliante em: ${shareUrl}`)}`, '_blank');
     } finally {
       setCapturing(false);
     }
@@ -832,18 +836,31 @@ export default function App() {
                     <div className="bg-black text-white w-7 h-7 flex-shrink-0 flex items-center justify-center font-black text-sm">3</div>
                     <p className="text-[13px] font-bold text-red-600">A FOTO APARECERÁ! AÍ É SÓ DAR <span className="underline decoration-double">ENTER</span>.</p>
                   </div>
+                  
+                  <div className="pt-2">
+                    <p className="text-[9px] text-center opacity-40 leading-tight uppercase font-black">Problemas ao colar? Tente o botão de Baixar PNG e anexe manualmente.</p>
+                  </div>
                 </div>
 
-                <button 
-                  onClick={() => {
-                    if (pendingZapUrl) window.open(pendingZapUrl, '_blank');
-                    setShowZapGuide(false);
-                    setPendingZapUrl(null);
-                  }}
-                  className="w-full bg-[#25D366] text-black font-black py-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all uppercase text-lg tracking-tighter"
-                >
-                  ENTENDI, ABRIR WHATSAPP 🚀
-                </button>
+                <div className="flex flex-col gap-3">
+                  <button 
+                    onClick={() => {
+                      if (pendingZapUrl) window.open(pendingZapUrl, '_blank');
+                    }}
+                    className="w-full bg-[#25D366] text-black font-black py-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all uppercase text-lg tracking-tighter"
+                  >
+                    ABRIR WHATSAPP 🚀
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setShowZapGuide(false);
+                      setPendingZapUrl(null);
+                    }}
+                    className="w-full bg-white text-neutral-400 font-black py-2 border-2 border-black text-xs uppercase"
+                  >
+                    FECHAR GUIA
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
