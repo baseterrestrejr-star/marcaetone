@@ -4,66 +4,6 @@ import fs from "fs";
 import LZString from "lz-string";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import { GoogleGenAI, Type } from "@google/genai";
-
-// Initialize AI
-const getAI = () => {
-  const apiKey = process.env.GEMINI_API_KEY || "";
-  return new GoogleGenAI({ apiKey });
-};
-
-async function gerarOcorrenciaBackend(nomeUsuario: string) {
-  const prompt = `Gere uma CRÔNICA POLICIAL curta (Coleção Vagalume) sobre "MARCA & TONE" (homem negro de boné). Repórter: ${nomeUsuario}. Retorne APENAS um JSON: {titulo, materia, nomeJornal, localInventado, imagem_descricao, autor, estilo: {corPrincipal, temaPortal}}`;
-
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    // Fallback mode if no API KEY is present to avoid 502 crash
-    if (!apiKey || apiKey.length < 5) {
-      console.warn("GEMINI_API_KEY ausente ou inválida. Usando modo demonstração.");
-      return {
-        titulo: "O MISTÉRIO DO BONÉ DESAPARECIDO",
-        materia: "Em uma manhã nebulosa no bairro do Limoeiro, Marca & Tone foi visto pela última vez segurando um café e seu inseparável boné. Testemunhas dizem que ele sorriu para o perigo antes de desaparecer entre as sombras da gráfica. A polícia investiga um rastro de pó de café e vergonha alheia.",
-        nomeJornal: "Diário da Vagalume",
-        localInventado: "Bairro do Limoeiro",
-        imagem_descricao: "Pulp novel style illustration of a detective finding a black cap in a dark alley",
-        autor: `Repórter: ${nomeUsuario} (Modo Demo)`,
-        imagem_url: "https://picsum.photos/seed/policial/1024/576",
-        estilo: { corPrincipal: "#ff0000", temaPortal: "POLICIAL" }
-      };
-    }
-
-    const ai = getAI();
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-latest", 
-      contents: prompt,
-      config: { responseMimeType: "application/json" }
-    });
-
-    if (!response || !response.text) throw new Error("Resposta da IA vazia");
-    
-    let text = response.text.trim();
-    if (text.startsWith("```")) text = text.replace(/```json|```/g, "").trim();
-    
-    const data = JSON.parse(text);
-    data.autor = `Repórter: ${nomeUsuario}`;
-    data.imagem_url = `https://image.pollinations.ai/prompt/${encodeURIComponent(data.imagem_descricao + ", police newspaper style")}?width=1024&height=576&nologo=true&seed=${Math.random()}`;
-    return data;
-  } catch (error: any) {
-    console.error("Erro no Gerador:", error);
-    // Even on error, return something to prevent 502
-    return {
-      titulo: "VIATURA QUEBROU NO CAMINHO",
-      materia: `Ocorreu um erro técnico: ${error.message}. Mas não se preocupe, Marca & Tone continua foragido na imaginação do público.`,
-      nomeJornal: "O Grito de Alerta",
-      localInventado: "Oficina do Seu Zé",
-      imagem_descricao: "A broken police car on a side road",
-      autor: "Sistema de Emergência",
-      imagem_url: "https://picsum.photos/seed/broken/1024/576",
-      estilo: { corPrincipal: "#000000", temaPortal: "ERRO" }
-    };
-  }
-}
 
 // Initialize Firebase with safety
 let db: any;
@@ -125,21 +65,9 @@ export async function createServerApp() {
     }
   });
 
-  // API to generate occurrence
+  // API to generate occurrence (DEPRECATED: Now handled on frontend)
   app.post("/api/gerar", async (req, res) => {
-    const { nomeUsuario } = req.body;
-    if (!nomeUsuario) return res.status(400).json({ error: "Nome necessário" });
-
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ error: "Erro: GEMINI_API_KEY não configurada no Netlify." });
-    }
-
-    try {
-      const data = await gerarOcorrenciaBackend(nomeUsuario);
-      res.json(data);
-    } catch (e: any) {
-      res.status(500).json({ error: `IA falhou: ${e.message}` });
-    }
+    res.status(410).json({ error: "Este endpoint foi desativado. Use a lógica de frontend agora." });
   });
 
   // In Development, serve Vite. In Netlify, let Netlify handle static files.

@@ -46,9 +46,9 @@ export default async function handler(req, res) {
         }`;
 
     const modelosParaTentar = [
-      "gemini-3-flash-preview",
-      "gemini-flash-latest",
-      "gemini-3.1-flash-lite-preview"
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-latest",
+      "gemini-pro"
     ];
 
     let ultimoErro = "";
