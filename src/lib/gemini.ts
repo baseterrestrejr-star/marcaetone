@@ -27,27 +27,33 @@ export async function gerarOcorrencia(nomeUsuario: string): Promise<Ocorrencia> 
     
     const prompt = `Você é um repórter de rádio policial sensacionalista da Bahia, no estilo 'pinga-sangue', que fala gritando e usa gírias pesadas e debochadas. Escreva uma crônica ultra-detalhada sobre as presepadas do meliante "MARCA & TONE" (indivíduo de cor negra, sempre de boné).
 
-        DIRETRIZES DE NÃO-REPETIÇÃO E ALTERNÂNCIA AUTOMÁTICA (CRITICAL):
-        A cada geração, você DEVE ALTERNAR RADICALMENTE o tema central da história. Escolha UMA das vertentes abaixo a cada vez para que o App nunca seja repetitivo:
-        - VERTENTE MACUMBA: Ele tenta fazer feitiço para os outros e o karma de Papai do Céu faz a mandinga voltar contra ele de forma hilária (ex: galo ataca ele, vela queima o boné, fica preso no despacho).
-        - VERTENTE LGBTQIA+: Tenta se engraçar, paquerar ou dar uma de 'garanhão' pra cima de Travestis ou Drags e leva o maior esculacho/surra de bolsa/salto alto da sua vida.
-        - VERTENTE GOLPE FALHADO: Tenta dar golpe do Pix, estelionato, roubo bizarro (dentadura, jegue, botijão) e se lasca na execução ou na fuga.
-        - VERTENTE HUMILHAÇÃO PÚBLICA: Fica entalado em algum lugar, cai no esgoto, a calça cai na frente da polícia, ou é corrido por animais (abelhas, bodes, cão vira-lata).
+        DIRETRIZES DE CRIATIVIDADE E NÃO-REPETIÇÃO (ESTRITAMENTE OBRIGATÓRIO):
+        A cada geração, você DEVE escolher um tema ÚNICO. É proibido repetir 'despacho' ou 'galo' em gerações seguidas.
+        
+        MUDANÇA DE CADA GERAÇÃO (SORTEIE MENTALMENTE):
+        1. LOCALIDADE: Mude o bairro de Salvador (Cajazeiras, Periperi, Sussuarana, Pau da Lima, Valéria, Nordeste de Amaralina, Ladeira da Montanha) ou cidades (Feira de Santana, Simões Filho, Jequié).
+        2. QUEM/O QUE BATE NO MELIANTE: Alterne entre: Vassoura de piaçava, Rodo quebrado, Sombrinha de velha, Guarda-chuva, Tamanco de madeira, Chinela Havaiana (bicuda), Panela de pressão, Cabo de carregador, Bíblia pesada, ou Bolsa de madame. Use 'Galo' apenas se o cenário for rural e muito raramente.
+        
+        3. CENÁRIOS VARIADOS (ESCOLHA UM DIFERENTE A CADA VEZ):
+           - VERTENTE GOLPISTA: Tenta dar o 'Golpe do Pix' em uma senhora e ela é faixa preta de karatê. Ou tenta vender um jegue pintado de zebra como se fosse animal exótico.
+           - VERTENTE LGBTQIA+: Tenta dar uma de 'malandro' ou paquerar uma Drag Queen ou Trans e leva uma surra de salto agulha 15cm e bolsada de grife na cara.
+           - VERTENTE RELIGIOSA: Entra num culto ou terreiro pra roubar e a 'mão de Deus' ou do 'Santo' pesa, ele fica entalado em algum lugar ou a calça rasga e cai na hora da fuga.
+           - VERTENTE REDE SOCIAL: Tenta gravar dancinha de TikTok em cima de uma viatura ou em um local proibido/perigoso e se lasca de forma épica na frente de todo mundo.
+           - VERTENTE INFIDELIDADE: Tenta paquerar a mulher de um guarda ou de um 'coronel' e tem que fugir pelado pelo telhado, caindo dentro de uma fossa ou caixa d'água.
+           - VERTENTE 'MANDINGA': O feitiço vira contra o feiticeiro de forma ridícula (ex: ele tenta botar o nome de alguém no sapato mas o próprio chulé o desmaia).
 
         DIRETRIZES GERAIS:
-        1. VARIEDADE DE PUNIÇÃO: Vassoura, chinelada, guarda-chuva, perseguição, ou apenas o karma.
-        2. VARIEDADE DE CENÁRIO: Mude o bairro de Salvador ou cidade da Bahia e o Nome do Jornal (Inédito: ex: O Grito da Bota, Rádio Lapada, Diário do Meliante).
-        3. TERMINOLOGIA: Use 'indivíduo de cor negra' ou 'elemento de boné'. Nunca use 'preto'.
-        4. IMAGEM: Descrição detalhada para ANIMAÇÃO 3D ESTILO PIXAR (Disney Pixar Style), mostrando o Marca & Tone na situação específica sorteada acima.
-        5. REPÓRTER: ${nomeUsuario}.
+        - Use gírias: 'Lá ele', 'Barril dobrado', 'Mizerê', 'O pau quebrou', 'Lágrimas de crocodilo', 'Comer o pão que o diabo amassou'.
+        - TERMINOLOGIA: 'Indivíduo de cor negra', 'elemento de boné'. Jamais use termos racistas.
+        - IMAGEM: Descrição para 3D PIXAR STYLE, mostrando o Marca & Tone na situação específica (ex: fugindo de guarda-chuva, levando bolsada, entalado na janela).
 
         RETORNE APENAS JSON:
         {
-          "titulo": "Título BOMBÁSTICO, INÉDITO e SENSACIONALISTA",
-          "materia": "A crônica detalhada (BO policial de rádio). Use gírias baianas 'lá ele', muito deboche e humor chulo.",
+          "titulo": "Título CURTO, BOMBÁSTICO e ENGRAÇADO",
+          "materia": "A crônica detalhada (BO policial). Use muito deboche e frases de efeito.",
           "nomeJornal": "Nome de jornal bizarro e inédito",
-          "localInventado": "Lugar na Bahia",
-          "imagem_descricao": "Descrição detalhada (Marca & Tone na situação central sorteada, Pixar 3D Movie style)",
+          "localInventado": "Bairro ou Cidade na Bahia",
+          "imagem_descricao": "Descrição detalhada para a IA de imagem (Pixar style, funny scene, detailed characters)",
           "estilo": { "corPrincipal": "#b91c1c", "temaPortal": "RÁDIO PINGA-SANGUE" }
         }`;
 
